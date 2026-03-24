@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FormLab — Checkout</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+
+<!-- GTM HEAD SNIPPET — replace GTM-XXXXXXX with your container ID -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
+
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --border: #2a2a2a;
+    --accent: #c8f04b;
+    --accent2: #f04b8a;
+    --text: #f0ede8;
+    --muted: #666;
+    --radius: 4px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; min-height: 100vh; }
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 2.5rem; border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: rgba(13,13,13,0.95);
+    backdrop-filter: blur(8px); z-index: 100;
+  }
+  .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; letter-spacing: -0.02em; color: var(--accent); text-decoration: none; }
+  .nav-logo span { color: var(--text); }
+  .nav-links { display: flex; gap: 0.5rem; }
+  .nav-link {
+    border: 1px solid transparent; color: var(--muted); font-family: 'DM Mono', monospace;
+    font-size: 0.78rem; padding: 0.4rem 1rem; border-radius: var(--radius);
+    text-decoration: none; letter-spacing: 0.05em; text-transform: uppercase; transition: all 0.2s;
+  }
+  .nav-link:hover { color: var(--text); border-color: var(--border); }
+  .nav-link.active { color: var(--accent2); border-color: var(--accent2); }
+  .gtm-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem; background: #1a1a1a;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 0.35rem 0.85rem; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.06em;
+  }
+  .gtm-dot { width: 7px; height: 7px; border-radius: 50%; background: #555; transition: background 0.3s; }
+  .gtm-dot.active { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); }
+
+  .hero-strip {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 3.5rem 2.5rem 2rem; border-bottom: 1px solid var(--border);
+  }
+  .hero-tag { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.6rem; }
+  .hero-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.05; letter-spacing: -0.03em; }
+  .hero-title em { font-style: normal; color: var(--accent2); }
+  .hero-desc { max-width: 380px; font-size: 0.82rem; color: var(--muted); line-height: 1.7; margin-top: 1rem; }
+  .page-num { font-family: 'Syne', sans-serif; font-size: 5rem; font-weight: 800; color: var(--border); line-height: 1; flex-shrink: 0; }
+
+  .main-grid { display: grid; grid-template-columns: 1fr 340px; min-height: calc(100vh - 220px); }
+  .form-area { padding: 2.5rem; border-right: 1px solid var(--border); }
+  .sidebar { padding: 2rem; background: var(--surface); }
+
+  .section-label {
+    font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.6rem;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .form-group { margin-bottom: 1.6rem; }
+  label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 0.5rem; letter-spacing: 0.05em; text-transform: uppercase; }
+  label span { color: var(--accent2); margin-left: 2px; }
+  input, select, textarea {
+    width: 100%; background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); font-family: 'DM Mono', monospace; font-size: 0.88rem;
+    padding: 0.75rem 1rem; border-radius: var(--radius); outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s; appearance: none;
+  }
+  input:focus, select:focus { border-color: var(--accent2); box-shadow: 0 0 0 2px rgba(240,75,138,0.12); }
+  select option { background: #1a1a1a; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .radio-group { display: flex; flex-direction: column; gap: 0.5rem; }
+  .radio-item {
+    display: flex; align-items: center; gap: 0.7rem; cursor: pointer;
+    font-size: 0.85rem; color: var(--text); padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .radio-item:hover { border-color: var(--muted); background: rgba(255,255,255,0.02); }
+  .radio-item input { width: 14px; height: 14px; accent-color: var(--accent2); }
+  .radio-item.selected { border-color: var(--accent2); background: rgba(240,75,138,0.05); }
+
+  .order-summary {
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 1rem; margin-bottom: 1.5rem; font-size: 0.8rem;
+  }
+  .order-row {
+    display: flex; justify-content: space-between; padding: 0.4rem 0;
+    border-bottom: 1px solid var(--border); color: var(--muted);
+  }
+  .order-row:last-child { border-bottom: none; padding-top: 0.6rem; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--text); }
+  .order-row:last-child span:last-child { color: var(--accent2); }
+
+  .btn-submit {
+    width: 100%; padding: 1rem; background: var(--accent2); color: #fff;
+    border: none; font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 1rem; border-radius: var(--radius); cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s; margin-top: 0.5rem;
+  }
+  .btn-submit:hover { opacity: 0.9; }
+  .btn-submit:active { transform: scale(0.99); }
+
+  /* INSPECTOR */
+  .inspector-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .inspector-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; }
+  .inspector-meta { display: flex; align-items: center; gap: 0.5rem; }
+  .event-count {
+    background: var(--accent2); color: #fff; font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 0.68rem; padding: 0.15rem 0.55rem;
+    border-radius: 99px; min-width: 22px; text-align: center;
+  }
+  .btn-clear {
+    background: none; border: 1px solid var(--border); color: var(--muted);
+    font-family: 'DM Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.55rem; border-radius: var(--radius); cursor: pointer; transition: all 0.2s;
+  }
+  .btn-clear:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .event-list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 58vh; overflow-y: auto; }
+  .event-card {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; animation: slideIn 0.25s ease;
+  }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: none; } }
+  .event-card.highlight { border-color: var(--accent2); }
+  .event-card.highlight .event-card-header { background: rgba(240,75,138,0.05); }
+
+  .event-card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.6rem 0.8rem; cursor: pointer; user-select: none;
+  }
+  .event-card-header:hover { background: rgba(255,255,255,0.02); }
+  .event-label { display: flex; align-items: center; gap: 0.5rem; }
+  .event-name { color: var(--accent2); font-size: 0.78rem; font-weight: 500; }
+  .event-card.begin_checkout .event-name { color: var(--accent); }
+  .event-card.add_payment_info .event-name { color: #f0b866; }
+  .event-badge {
+    font-size: 0.6rem; padding: 0.1rem 0.4rem; border-radius: 2px; letter-spacing: 0.05em;
+    background: rgba(240,75,138,0.1); color: var(--accent2); border: 1px solid rgba(240,75,138,0.25);
+  }
+  .event-time { font-size: 0.65rem; color: var(--muted); }
+  .event-chevron { color: var(--muted); font-size: 0.7rem; transition: transform 0.2s; }
+  .event-card.open .event-chevron { transform: rotate(90deg); }
+  .event-body { display: none; padding: 0 0.8rem 0.8rem; border-top: 1px solid var(--border); }
+  .event-card.open .event-body { display: block; }
+  .json-tree { margin-top: 0.6rem; }
+  .json-row { display: flex; gap: 0.5rem; font-size: 0.7rem; line-height: 1.8; padding: 0.1rem 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .json-key { color: #7eb8f7; flex-shrink: 0; }
+  .json-val-str { color: #98e0a0; }
+  .json-val-num { color: #f0b866; }
+  .json-val-arr { color: #c98ef5; font-style: italic; }
+
+  .dl-hint {
+    margin-top: 1.2rem; padding: 0.9rem; border: 1px dashed var(--border);
+    border-radius: var(--radius); font-size: 0.7rem; color: var(--muted); line-height: 1.7;
+  }
+  .dl-hint strong { color: var(--accent2); }
+  .dl-hint code {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 2px; padding: 0.1em 0.3em; color: var(--text); font-size: 0.68rem;
+  }
+  .empty-state { color: var(--muted); font-size: 0.78rem; font-style: italic; padding: 0.5rem 0; }
+
+  footer {
+    border-top: 1px solid var(--border); padding: 1.2rem 2.5rem;
+    font-size: 0.7rem; color: var(--muted); display: flex; justify-content: space-between; align-items: center;
+  }
+  footer code { color: var(--accent2); }
+
+  .toast {
+    position: fixed; bottom: 2rem; right: 2rem; background: var(--accent2); color: #fff;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem;
+    padding: 0.9rem 1.4rem; border-radius: var(--radius); z-index: 200;
+    transform: translateY(80px); opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s; pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 768px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .form-area { border-right: none; border-bottom: 1px solid var(--border); }
+    .page-num { display: none; }
+    nav { padding: 1rem 1.2rem; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- GTM NOSCRIPT -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<nav>
+  <a class="nav-logo" href="index.html">Form<span>Lab</span></a>
+  <div class="nav-links">
+    <a class="nav-link" href="index.html">Contact Form</a>
+    <a class="nav-link active" href="checkout.html">Checkout Form</a>
+  </div>
+  <div class="gtm-badge">
+    <div class="gtm-dot" id="gtm-dot"></div>
+    GTM READY
+  </div>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<div class="hero-strip">
+  <div>
+    <div class="hero-tag">Page 02 — /checkout.html</div>
+    <h1 class="hero-title">Complete <em>Order</em></h1>
+    <p class="hero-desc">Practice GA4 ecommerce events — <strong>begin_checkout</strong>, <strong>add_payment_info</strong>, and <strong>purchase</strong> — on this checkout form.</p>
+  </div>
+  <div class="page-num">02</div>
+</div>
+
+<div class="main-grid">
+  <div class="form-area">
+    <div class="section-label">Shipping Information</div>
+    <form id="checkout-form" novalidate>
+
+      <div class="form-group">
+        <label>Full Name <span>*</span></label>
+        <input type="text" name="full_name" placeholder="Alan Turing" required />
+      </div>
+
+      <div class="form-group">
+        <label>Email Address <span>*</span></label>
+        <input type="email" name="email" placeholder="alan@example.com" required />
+      </div>
+
+      <div class="form-group">
+        <label>Shipping Address <span>*</span></label>
+        <input type="text" name="address" placeholder="221B Baker Street" required />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>City <span>*</span></label>
+          <input type="text" name="city" placeholder="Hyderabad" required />
+        </div>
+        <div class="form-group">
+          <label>PIN Code <span>*</span></label>
+          <input type="text" name="pin" placeholder="500001" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Country</label>
+        <select name="country">
+          <option value="IN">India</option>
+          <option value="US">United States</option>
+          <option value="GB">United Kingdom</option>
+          <option value="AU">Australia</option>
+          <option value="SG">Singapore</option>
+        </select>
+      </div>
+
+      <div class="section-label" style="margin-top:2rem">Payment Details</div>
+
+      <div class="form-group">
+        <label>Payment Method <span>*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="payment_method" value="upi" /> UPI</label>
+          <label class="radio-item"><input type="radio" name="payment_method" value="card" /> Credit / Debit Card</label>
+          <label class="radio-item"><input type="radio" name="payment_method" value="netbanking" /> Net Banking</label>
+          <label class="radio-item"><input type="radio" name="payment_method" value="cod" /> Cash on Delivery</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Promo Code</label>
+        <input type="text" name="promo_code" placeholder="FORMLAB20" />
+      </div>
+
+      <div class="order-summary">
+        <div class="order-row"><span>GTM Mastery Course</span><span>₹1,999</span></div>
+        <div class="order-row"><span>Analytics Bootcamp</span><span>₹1,499</span></div>
+        <div class="order-row"><span>Total</span><span>₹3,498</span></div>
+      </div>
+
+      <button type="submit" class="btn-submit">Place Order →</button>
+    </form>
+  </div>
+
+  <div class="sidebar">
+    <div class="inspector-header">
+      <div class="inspector-title">📡 dataLayer</div>
+      <div class="inspector-meta">
+        <span class="event-count" id="event-count">0</span>
+        <button class="btn-clear" onclick="clearLog()">Clear</button>
+      </div>
+    </div>
+    <div class="event-list" id="event-list">
+      <div class="empty-state" id="empty-state">No events yet — interact with the form.</div>
+    </div>
+    <div class="dl-hint">
+      <strong>GTM Custom Event triggers:</strong><br><br>
+      • <code>begin_checkout</code> — first field focus<br>
+      • <code>add_payment_info</code> — payment method select<br>
+      • <code>purchase</code> — on submit<br><br>
+      These match GA4 recommended ecommerce events exactly.
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>FormLab — GTM Practice · Page 2 of 2</span>
+  <span>Replace <code>GTM-XXXXXXX</code> with your container ID</span>
+</footer>
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  let eventCount = 0;
+
+  function pushEvent(obj) {
+    dataLayer.push(obj);
+    renderEvent(obj);
+    activateDot();
+  }
+
+  function activateDot() {
+    const dot = document.getElementById('gtm-dot');
+    dot.classList.add('active');
+    clearTimeout(dot._t);
+    dot._t = setTimeout(() => dot.classList.remove('active'), 1200);
+  }
+
+  function renderEvent(obj) {
+    document.getElementById('empty-state')?.remove();
+    eventCount++;
+    document.getElementById('event-count').textContent = eventCount;
+
+    const list = document.getElementById('event-list');
+    const card = document.createElement('div');
+    const isHighlight = obj.event === 'purchase';
+    card.className = `event-card ${obj.event} ${isHighlight ? 'highlight' : ''}`;
+
+    const time = new Date().toLocaleTimeString('en-IN', { hour12: false });
+    const rows = Object.entries(obj).map(([k, v]) => {
+      let valClass = 'json-val-str', display;
+      if (typeof v === 'number') { valClass = 'json-val-num'; display = v; }
+      else if (Array.isArray(v)) { valClass = 'json-val-arr'; display = `[ ${v.length} item${v.length!==1?'s':''} ]`; }
+      else { display = `"${v}"`; }
+      return `<div class="json-row"><span class="json-key">${k}:</span><span class="${valClass}">${display}</span></div>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="event-card-header" onclick="toggleCard(this.parentElement)">
+        <div class="event-label">
+          <span class="event-name">${obj.event}</span>
+          ${isHighlight ? '<span class="event-badge">KEY</span>' : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem">
+          <span class="event-time">${time}</span>
+          <span class="event-chevron">▶</span>
+        </div>
+      </div>
+      <div class="event-body"><div class="json-tree">${rows}</div></div>`;
+
+    list.prepend(card);
+    card.classList.add('open');
+  }
+
+  function toggleCard(card) { card.classList.toggle('open'); }
+
+  function clearLog() {
+    document.getElementById('event-list').innerHTML = '<div class="empty-state" id="empty-state">No events yet — interact with the form.</div>';
+    eventCount = 0;
+    document.getElementById('event-count').textContent = '0';
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  document.querySelectorAll('.radio-item input').forEach(inp => {
+    inp.addEventListener('change', () => {
+      inp.closest('.radio-group').querySelectorAll('.radio-item').forEach(l => l.classList.remove('selected'));
+      inp.closest('.radio-item').classList.add('selected');
+    });
+  });
+
+  let started = false;
+  document.getElementById('checkout-form').querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('focus', () => {
+      if (!started) {
+        started = true;
+        pushEvent({
+          event: 'begin_checkout',
+          currency: 'INR',
+          value: 3498,
+          items: [
+            { item_name: 'GTM Mastery Course', price: 1999, quantity: 1 },
+            { item_name: 'Analytics Bootcamp', price: 1499, quantity: 1 }
+          ]
+        });
+      }
+    });
+    el.addEventListener('change', () => {
+      if (el.name === 'payment_method') {
+        pushEvent({ event: 'add_payment_info', currency: 'INR', value: 3498, payment_type: el.value });
+      }
+    });
+  });
+
+  document.getElementById('checkout-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    pushEvent({
+      event: 'purchase',
+      transaction_id: 'TXN-' + Date.now(),
+      currency: 'INR',
+      value: 3498,
+      payment_type: fd.get('payment_method') || 'not_selected',
+      promo_code: fd.get('promo_code') || 'none',
+      items: [
+        { item_name: 'GTM Mastery Course', price: 1999, quantity: 1 },
+        { item_name: 'Analytics Bootcamp', price: 1499, quantity: 1 }
+      ]
+    });
+    showToast('✓ purchase event fired — see dataLayer panel!');
+    started = false;
+  });
+</script>
+</body>
+</html>
